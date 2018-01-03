@@ -1,0 +1,98 @@
+#!/bin/zsh 
+
+case "$1" in 
+
+--help)	echo "======================================"
+	echo " -m - Enters Monitor Mode"
+	echo " -b - Sniff a Specific BSSID"
+	echo " -d - Send Deauth Packets"
+	echo " -q - Quit Monitor Mode"
+	echo "======================================"
+	;;
+
+-m)	echo 
+	echo "======================================"
+	echo "Entering Monitor Mode..."
+	echo "======================================"
+	sleep 1
+
+	airmon-ng start wlan0
+	killall NetworkManager
+	killall wpa_supplicant
+	killall dhclient
+
+	airodump-ng wlan0mon	
+	;;
+
+-b)	echo
+	echo "======================================"
+	echo "Entering Monitor to Specific BSSID..." 
+	echo "======================================"
+	sleep 1
+
+	airmon-ng start wlan0
+	killall NetworkManager
+	killall wpa_supplicant
+	killall dhclient
+	
+	echo "======================================"
+	echo "Type the BSSID: "
+	read bssid
+	echo "======================================"
+
+	echo
+	echo "======================================"
+	echo "Type the Channel: "
+	read channel	
+	echo "======================================"
+
+	echo
+	echo "======================================"
+	echo "Type the Name of the File: "
+	read name
+	echo "======================================"
+	airodump-ng --bssid $bssid --channel $channel --write /home/m0rph3us/Documents/outputs/Wifi_Dump/$name wlan0mon 
+	;;
+
+-d)	echo
+	echo "======================================"
+	echo "Entering Aireplay-ng..."
+	echo "======================================"
+	sleep 1
+
+	echo
+	echo "======================================"
+	echo "Type the BSSID: "
+	echo "======================================"
+	read bssid
+	aireplay-ng --deauth 10 -a $bssid wlan0mon
+	;;
+
+-q)	echo 
+	echo "======================================"
+	echo "Quiting airmon-ng..."
+	echo "======================================"
+	airmon-ng stop wlan0mon
+	sleep 1
+	
+	echo
+	echo "======================================"
+	echo "Interface wlan0 Up"
+	echo "====================================="
+	ifconfig wlan0 up
+	sleep 1
+
+	echo
+	echo "====================================="
+	echo "Restarting Network"
+	echo "====================================="
+	service network-manager restart
+	sleep 1
+
+	echo
+	echo "====================================="
+	echo "Network is Up!"
+	echo "====================================="
+	;;
+esac
+
